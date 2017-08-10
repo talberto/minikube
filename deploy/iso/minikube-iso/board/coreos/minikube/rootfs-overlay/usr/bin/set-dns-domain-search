@@ -1,0 +1,21 @@
+#!/bin/bash
+
+set -o nounset
+set -o pipefail
+
+RESOLVED_CONF_FILE="/etc/systemd/resolved.conf"
+
+function set-dns-domain-search {
+
+    local new_domain="$1"
+
+    echo "Changing DNS search domain to $new_domain"
+    sed -i "s/^#*Domains=.*/Domains=$new_domain/" $RESOLVED_CONF_FILE
+
+    # Restart concerned daemons
+    echo "Restarting concerned daemons"
+    systemctl daemon-reload
+    systemctl restart systemd-resolved
+}
+
+set-dns-domain-search $1
