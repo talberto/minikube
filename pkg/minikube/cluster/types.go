@@ -35,6 +35,7 @@ type MachineConfig struct {
 	Downloader          util.ISODownloader `json:"-"`
 	DockerOpt           []string           // Each entry is formatted as KEY=VALUE.
 	DisableDriverMounts bool               // Only used by virtualbox and xhyve
+	DNSSearchDomain 	string
 }
 
 // KubernetesConfig contains the parameters used to configure the VM Kubernetes.

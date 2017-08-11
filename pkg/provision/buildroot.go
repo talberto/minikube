@@ -22,6 +22,7 @@ import (
 	"path"
 	"text/template"
 	"time"
+	"strings"
 
 	"github.com/docker/machine/libmachine/auth"
 	"github.com/docker/machine/libmachine/drivers"
@@ -155,6 +156,15 @@ func (p *BuildrootProvisioner) Provision(swarmOptions swarm.Options, authOptions
 		return err
 	}
 
+	// Search for the dns-search-domain flag in engineOptions, if found set the
+	// dns domain search in the minikube VM
+	for _, keyValue := range engineOptions.ArbitraryFlags {
+		if strings.HasPrefix(keyValue, "dns-search-domain=") {
+			dnsDomainSearch := strings.SplitAfterN(keyValue, "dns-search-domain=", 1)
+			p.setDnsSearchDomain(dnsDomainSearch[0])
+		}
+	}
+
 	return nil
 }
 
@@ -169,4 +179,10 @@ func setRemoteAuthOptions(p provision.Provisioner) auth.Options {
 	authOptions.ServerKeyRemotePath = path.Join(dockerDir, "server-key.pem")
 
 	return authOptions
+}
+
+// Just a wrapper for calling the actual binary that will set the dns domain search
+func (p *BuildrootProvisioner) setDnsSearchDomain(searchDomain string) error {
+	_, err := p.SSHCommand(fmt.Sprintf("/usr/bin/set-dns-domain-search \"%s\"", searchDomain))
+	return err
 }

@@ -352,7 +352,7 @@ func engineOptions(config MachineConfig) *engine.Options {
 		Env:              config.DockerEnv,
 		InsecureRegistry: config.InsecureRegistry,
 		RegistryMirror:   config.RegistryMirror,
-		ArbitraryFlags:   config.DockerOpt,
+		ArbitraryFlags:   append(config.DockerOpt, fmt.Sprintf("dns-search-domain=%s", config.DNSSearchDomain)),
 	}
 	return &o
 }
